@@ -1,17 +1,11 @@
-import { Text, View, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
-import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
-
+import { StyleSheet, View } from 'react-native';
+import ContactList from '../src/components/ContactList';
+import { COLORS, FONT_SIZES, SPACING } from '../src/constants/theme';
 
 export default function HomeScreen() {
-	  {/* Router instance to navigate between screens: const router = useRouter(); */}
-    
-
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Contacts</Text>
-            <Text style={styles.bottomText}>Add Contact</Text>
-            {/* button router.push to add contact details*/}
+            <ContactList />
         </View>
     );
 }
@@ -20,8 +14,6 @@ export default function HomeScreen() {
         container: {
             flex: 1,
             backgroundColor: COLORS.background,
-            justifyContent: "center",
-            alignItems: "center",
             padding: SPACING.lg,
         },
         title: {
