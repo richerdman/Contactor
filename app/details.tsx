@@ -92,6 +92,7 @@ export default function ContactDetailScreen() {
       }
 
       setContact(updated);
+      Alert.alert("Saved", "Contact updated successfully.");
       
       router.back();
     } catch (e) {
