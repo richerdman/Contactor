@@ -1,8 +1,8 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Platform } from 'react-native';
 
-// Stored contact type
-// Represents a contact stored in the filesystem or localStorage.
+// Stored contact data structure
+// File system-based storage for contacts, with localStorage fallback for web
 
 export type StoredContact = {
   filename: string; // file name in contacts dir
