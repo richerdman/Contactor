@@ -1,8 +1,8 @@
 export type Contact = {
-    id: number;
+    id: string;
     name: string;
-    phone: number;
-    thumbnailPhoto: string;
+    phoneNumber: string;
+    photo: string;
 };
 
 export type RootStackParamList = {
