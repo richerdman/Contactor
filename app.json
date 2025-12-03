@@ -12,6 +12,10 @@
       "supportsTablet": true
     },
     "android": {
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -26,6 +30,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-file-system",
       "expo-router",
       [
         "expo-splash-screen",
