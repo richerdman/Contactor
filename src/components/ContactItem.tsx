@@ -36,13 +36,13 @@ export default function ContactItem({ name, photo, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', padding: 12, alignItems: 'center', borderBottomWidth: 1, borderColor: '#eee' },
+  row: { flexDirection: 'row', padding: 12, alignItems: 'center', borderTopWidth: 0.6, borderColor: '#cbcbcbff', marginHorizontal: 12 },
   thumb: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#ddd' },
   placeholder: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#6b7280',
+    backgroundColor: '#949db3ff',
     alignItems: 'center',
     justifyContent: 'center',
   },

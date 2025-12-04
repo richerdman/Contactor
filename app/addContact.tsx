@@ -12,7 +12,6 @@ export default function AddContactScreen() {
     const { image: photoUri, pickImage, takePhoto } = useImagePicker();
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [photo] = useState('');
     const [saving, setSaving] = useState(false);
 
     const handleCreate = async () => {
@@ -26,7 +25,7 @@ export default function AddContactScreen() {
             await addContact({
                 name: name.trim(),
                 phoneNumber: phoneNumber.trim(),
-                photo: (photoUri ?? photo).trim(),
+                photo: (photoUri ?? '').trim(),
             });
             
             router.push('/');
@@ -60,30 +59,31 @@ export default function AddContactScreen() {
                 editable={!saving}
             />
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.md }}>
+            <Text style={styles.label}>Photo</Text>
+            <View style={styles.photoContainer}>
                 {photoUri ? (
-                    <Image source={{ uri: photoUri }} style={{ width: 72, height: 72, borderRadius: 8, marginRight: 12 }} />
+                    <Image source={{ uri: photoUri }} style={styles.photoPreview} />
                 ) : (
-                    <View style={{ width: 72, height: 72, borderRadius: 8, backgroundColor: '#eee', marginRight: 12, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: '#777' }}>No photo</Text>
+                    <View style={styles.photoPlaceholder}>
+                        <Text style={styles.photoPlaceholderText}></Text>
                     </View>
                 )}
 
-                <View style={styles.smallButtonRow}>
+                <View style={styles.buttonRow}>
                     <TouchableOpacity
-                        style={[styles.smallButton, styles.primaryButton]}
-                        onPress={async () => { const saved = await pickImage(); if (saved) {/* no-op: hook already updates image */} }}
-                        activeOpacity={0.8}
+                        style={[styles.button, styles.chooseButton]}
+                        onPress={async () => { await pickImage(); }}
+                        activeOpacity={0.7}
                     >
-                        <Text style={styles.smallButtonText}>Pick Photo</Text>
+                        <Text style={styles.buttonText}>Choose Photo</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={[styles.smallButton, styles.secondaryButton]}
+                        style={[styles.button, styles.takeButton]}
                         onPress={async () => { await takePhoto(); }}
-                        activeOpacity={0.8}
+                        activeOpacity={0.7}
                     >
-                        <Text style={styles.smallButtonText}>Take Photo</Text>
+                        <Text style={styles.buttonText}>Take Photo</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -126,37 +126,69 @@ const styles = StyleSheet.create({
     },
     input: {
         backgroundColor: COLORS.white,
-        borderRadius: 8,
-        padding: SPACING.md,
+        borderRadius: 12,
+        padding: SPACING.lg,
         fontSize: FONT_SIZES.medium,
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#e0e0e0',
         marginBottom: SPACING.md,
+        minHeight: 48,
     },
     buttonContainer: {
-        marginTop: SPACING.md,
+        marginTop: SPACING.lg,
+        gap: SPACING.sm,
     },
     cancelButton: {
-        backgroundColor: '#999',
-        marginTop: SPACING.sm,
+        backgroundColor: '#cbcbcbff',
     },
-    smallButtonRow: {
+    photoContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        marginBottom: SPACING.lg,
+        gap: SPACING.md,
     },
-    smallButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        minWidth: 120,
+    photoPreview: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#f5f5f5',
+    },
+    photoPlaceholder: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#f0f0f0',
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 8,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        borderStyle: 'dashed',
     },
-    smallButtonText: {
+    photoPlaceholderText: {
+        fontSize: 40,
+    },
+    buttonRow: {
+        flexDirection: 'column',
+        gap: SPACING.sm,
+        flex: 1,
+    },
+    button: {
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 44,
+    },
+    chooseButton: {
+        backgroundColor: COLORS.primary,
+    },
+    takeButton: {
+        backgroundColor: '#666',
+    },
+    buttonText: {
         color: COLORS.white,
-        fontSize: FONT_SIZES.small ?? 14,
+        fontSize: FONT_SIZES.medium,
         fontWeight: '600',
     },
     primaryButton: {
