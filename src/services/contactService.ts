@@ -38,7 +38,13 @@ export async function getAllContacts(): Promise<Contact[]> {
                 contacts.push(contact);
             }
         }
-        
+        // Sort contacts alphabetically by name (case-insensitive)
+        contacts.sort((a, b) => {
+            const an = (a.name || '').trim();
+            const bn = (b.name || '').trim();
+            return an.localeCompare(bn, undefined, { sensitivity: 'base' });
+        });
+
         return contacts;
     } catch (error) {
         console.error('Error reading contacts:', error);

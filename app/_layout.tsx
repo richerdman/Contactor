@@ -16,6 +16,7 @@ export default function Layout() {
       >
           <Stack.Screen name="index" options={{ title: "Contacts" }} />
           <Stack.Screen name="addContact" options={{ title: 'Add Contact' }} />
+          <Stack.Screen name="details" options={{ title: "Contact Details" }} />
       </Stack>
   );
 }
