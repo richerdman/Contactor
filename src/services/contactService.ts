@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import type { Contact } from "../types/types";
 
 const CONTACTS_DIR = `${FileSystem.documentDirectory}contacts/`;

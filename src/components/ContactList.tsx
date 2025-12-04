@@ -7,6 +7,7 @@ import Button from './button';
 import { useContacts } from '../hooks/useContacts';
 import useDebouncedValue from '../hooks/useDebouncedValue';
 import ContactItem from './ContactItem';
+import { importContactsFromDevice } from '../services/contactImportService';
 
 // Contact list component
 // This component displays a searchable list of contacts and allows navigation to contact details or creation.
@@ -14,6 +15,7 @@ import ContactItem from './ContactItem';
 export default function ContactList() {
     const { contacts, reload } = useContacts();
     const [query, setQuery] = useState('');
+    const [importing, setImporting] = useState(false);
     const debouncedQuery = useDebouncedValue(query, 250);
     const router = useRouter?.() as any;
 
@@ -30,6 +32,20 @@ export default function ContactList() {
             return () => {};
         }, [reload])
     );
+
+    const handleImportContacts = async () => {
+        setImporting(true);
+        try {
+            const count = await importContactsFromDevice();
+            alert(`Imported ${count} contacts from device.`);
+            window.location.reload();
+        } catch (error) {
+            alert('Failed to import contacts.');
+            console.error('Import contacts error:', error);
+        } finally {
+            setImporting(false);
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -62,6 +78,9 @@ export default function ContactList() {
             <View style={styles.fabContainer} pointerEvents="box-none">
                 <Button title="Add Contact" onPress={() => router?.push?.('/addContact')} style={styles.fab} />
             </View>
+            <View style={styles.importButton} pointerEvents="box-none">
+                <Button title="Import Contacts" onPress={handleImportContacts} style={styles.fab} />
+            </View>
         </View>
     );
 }
@@ -72,4 +91,5 @@ const styles = StyleSheet.create({
     search: { flex: 1, borderWidth: 1, borderColor: '#ddd', borderRadius: 6, padding: 8, marginRight: 8 },
     fabContainer: { position: 'absolute', left: 0, right: 0, bottom: 24, alignItems: 'center', zIndex: 10 },
     fab: { minWidth: 180, paddingVertical: 12 },
+    importButton: { position: 'absolute', left: 0, right: 0, bottom: 80, alignItems: 'center', zIndex: 10 },
 });
