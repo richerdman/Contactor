@@ -19,9 +19,6 @@ export default function ContactList() {
     const onSearchFocus = () => {
         Animated.timing(focusAnim, { toValue: 1, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
     };
-    const onSearchBlur = () => {
-        Animated.timing(focusAnim, { toValue: 0, duration: 160, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
-    };
 
     
 
@@ -79,7 +76,6 @@ export default function ContactList() {
                         autoCorrect={false}
                         placeholderTextColor="#8b95a6"
                         onFocus={onSearchFocus}
-                        onBlur={onSearchBlur}
                     />
                     {query.length > 0 ? (
                         <TouchableOpacity onPress={() => setQuery('')} style={styles.clearButton}>
