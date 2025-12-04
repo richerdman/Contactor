@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import Button from '../src/components/button';
 import { useContacts } from '../src/hooks/useContacts';
+import { useImagePicker } from '../src/hooks/useImagePicker';
 import { COLORS, SPACING, FONT_SIZES } from '../src/constants/theme';
 
 export default function AddContactScreen() {
     const router = useRouter();
     const { addContact } = useContacts();
+    const { image: photoUri, pickImage, takePhoto } = useImagePicker();
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [photo, setPhoto] = useState('');
+    const [photo] = useState('');
     const [saving, setSaving] = useState(false);
 
     const handleCreate = async () => {
@@ -24,7 +26,7 @@ export default function AddContactScreen() {
             await addContact({
                 name: name.trim(),
                 phoneNumber: phoneNumber.trim(),
-                photo: photo.trim(),
+                photo: (photoUri ?? photo).trim(),
             });
             
             router.push('/');
@@ -58,15 +60,33 @@ export default function AddContactScreen() {
                 editable={!saving}
             />
 
-            <Text style={styles.label}>Photo URL</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter photo URL"
-                value={photo}
-                onChangeText={setPhoto}
-                autoCapitalize="none"
-                editable={!saving}
-            />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.md }}>
+                {photoUri ? (
+                    <Image source={{ uri: photoUri }} style={{ width: 72, height: 72, borderRadius: 8, marginRight: 12 }} />
+                ) : (
+                    <View style={{ width: 72, height: 72, borderRadius: 8, backgroundColor: '#eee', marginRight: 12, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ color: '#777' }}>No photo</Text>
+                    </View>
+                )}
+
+                <View style={styles.smallButtonRow}>
+                    <TouchableOpacity
+                        style={[styles.smallButton, styles.primaryButton]}
+                        onPress={async () => { const saved = await pickImage(); if (saved) {/* no-op: hook already updates image */} }}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={styles.smallButtonText}>Pick Photo</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.smallButton, styles.secondaryButton]}
+                        onPress={async () => { await takePhoto(); }}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={styles.smallButtonText}>Take Photo</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
 
             {saving ? (
             <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: SPACING.xl }} />
@@ -119,5 +139,30 @@ const styles = StyleSheet.create({
     cancelButton: {
         backgroundColor: '#999',
         marginTop: SPACING.sm,
+    },
+    smallButtonRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
+    smallButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        minWidth: 120,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 8,
+    },
+    smallButtonText: {
+        color: COLORS.white,
+        fontSize: FONT_SIZES.small ?? 14,
+        fontWeight: '600',
+    },
+    primaryButton: {
+        backgroundColor: COLORS.primary,
+    },
+    secondaryButton: {
+        backgroundColor: '#555',
     },
 });
