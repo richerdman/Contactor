@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Image, ScrollView, Text, TextInput, View } from "react-native";
 import { SPACING } from "../src/constants/theme";
-import { getContactById, updateContact } from "../src/services/contactService";
+import { getContactById, updateContact, deleteContact } from "../src/services/contactService";
 import type { Contact } from "../src/types/types";
 
 type Params = {
@@ -21,6 +21,7 @@ export default function ContactDetailScreen() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -101,6 +102,39 @@ export default function ContactDetailScreen() {
     }
   }
 
+  async function onDelete() {
+    if (!contact) return;
+
+    Alert.alert(
+      'Delete contact',
+      `Delete ${contact.name}? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeleting(true);
+              const ok = await deleteContact(contact.id!);
+              if (!ok) {
+                Alert.alert('Error', 'Failed to delete contact.');
+                return;
+              }
+              Alert.alert('Deleted', 'Contact deleted.');
+              router.back();
+            } catch (e) {
+              console.error('Delete failed', e);
+              Alert.alert('Error', 'Failed to delete contact.');
+            } finally {
+              setDeleting(false);
+            }
+          }
+        }
+      ]
+    );
+  }
+
   if (loading) {
     return (
       <View style={{ padding: SPACING.md }}>
@@ -119,7 +153,6 @@ export default function ContactDetailScreen() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: SPACING.md }}>
-      <Text style={{ fontSize: 24, fontWeight: "700", marginBottom: SPACING.sm }}>Contact Details</Text>
 
       {photo ? (
         <Image source={{ uri: photo }} style={{ width: 160, height: 160, borderRadius: 80, marginBottom: SPACING.md }} />
@@ -149,6 +182,8 @@ export default function ContactDetailScreen() {
       />
 
       <Button title="Save" onPress={onSave} />
+      <View style={{ height: SPACING.sm }} />
+      <Button title={deleting ? 'Deleting…' : 'Delete'} color="#D9534F" onPress={onDelete} disabled={deleting} />
     </ScrollView>
   );
 }
