@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import Button from '../src/components/button';
 import { useContacts } from '../src/hooks/useContacts';
 import { useImagePicker } from '../src/hooks/useImagePicker';
 import { COLORS, SPACING, FONT_SIZES } from '../src/constants/theme';
+import { pickAndImportContact, importAllContactsFromDevice } from '../src/services/contactImportService';
+import { Contact } from '../src/types/types';
 
 export default function AddContactScreen() {
     const router = useRouter();
@@ -13,6 +15,7 @@ export default function AddContactScreen() {
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [saving, setSaving] = useState(false);
+    const [ importing, setImporting] = useState(false);
 
     const handleCreate = async () => {
         if (!name.trim()) {
@@ -36,6 +39,45 @@ export default function AddContactScreen() {
                 setSaving(false);
         }
     };
+
+    const handlePickContact = async () => {
+        setImporting(true);
+        try {
+            const success = await pickAndImportContact();
+            if (success) {
+                Alert.alert('Success', 'Contact imported!');
+                router.back();
+            }
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'Failed to import contact');
+        } finally {
+            setImporting(false);
+        }
+      };
+    
+      // Import all contacts
+    const handleImportAll = async () => {
+        Alert.alert( 'Import All Contacts', 'This will import all contacts from your device. Continue?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                text: 'Import All',
+                onPress: async () => {
+                    setImporting(true);
+                    try {
+                        const count = await importAllContactsFromDevice();
+                        Alert.alert('Success', `Imported ${count} contacts!`);
+                        await router.back();
+                    } catch (error: any) {
+                        Alert.alert('Error', error.message || 'Failed to import contacts');
+                    } finally {
+                        setImporting(false);
+                    }
+                }
+                }
+            ]
+        );
+      };
 
     return (
         <ScrollView style={styles.container}>
@@ -104,6 +146,35 @@ export default function AddContactScreen() {
                 />
             </View>
             )}
+
+            <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.dividerLine} />
+            </View>
+            <TouchableOpacity
+                style={[styles.addButton, styles.pickButton]}
+                onPress={handlePickContact}
+                disabled={importing}
+                >
+                {importing ? (
+                    <ActivityIndicator color={COLORS.white} />
+                ) : (
+                    <Text style={styles.addButtonText}>Pick from Device</Text>
+                )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.addButton, styles.importButton]}
+                    onPress={handleImportAll}
+                    disabled={importing}
+                    >
+                    {importing ? (
+                        <ActivityIndicator color={COLORS.white} />
+                    ) : (
+                        <Text style={styles.addButtonText}>Import All</Text>
+                )}
+            </TouchableOpacity>
         </View>
         </ScrollView>
     );
@@ -196,5 +267,39 @@ const styles = StyleSheet.create({
     },
     secondaryButton: {
         backgroundColor: '#555',
+    },
+    divider: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: SPACING.md,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#ccc',
+    },
+    dividerText: {
+        alignContent: 'center',
+        marginHorizontal: SPACING.lg,
+        fontSize: FONT_SIZES.medium,
+        color: '#666',
+    },
+    addButton: {
+        paddingVertical: 14,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: SPACING.sm,
+    },
+    pickButton: {
+        backgroundColor: COLORS.primary,
+    },
+    importButton: {
+        backgroundColor: '#666',
+    },
+    addButtonText: {
+        color: COLORS.white,
+        fontSize: FONT_SIZES.medium,
+        fontWeight: '600',
     },
 });

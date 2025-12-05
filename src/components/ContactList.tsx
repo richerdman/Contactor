@@ -6,7 +6,7 @@ import {  SectionList, StyleSheet, Text, TextInput, View, TouchableOpacity, Anim
 import Button from './button';
 import { useContacts } from '../hooks/useContacts';
 import ContactItem from './ContactItem';
-import { importContactsFromDevice } from '../services/contactImportService';
+import { Contact } from '../types/types';
 
 // Contact list component
 // This component displays a searchable list of contacts and allows navigation to contact details or creation.
@@ -14,7 +14,6 @@ import { importContactsFromDevice } from '../services/contactImportService';
 export default function ContactList() {
     const { contacts, reload } = useContacts();
     const [query, setQuery] = useState('');
-    const [importing, setImporting] = useState(false);
     const router = useRouter?.() as any;
     const sectionListRef = useRef<SectionList>(null);
     const focusAnim = useRef(new Animated.Value(0)).current;
@@ -65,20 +64,6 @@ export default function ContactList() {
         }, [reload])
     );
 
-    const handleImportContacts = async () => {
-        setImporting(true);
-        try {
-            const count = await importContactsFromDevice();
-            alert(`Imported ${count} contacts from device.`);
-            window.location.reload();
-        } catch (error) {
-            alert('Failed to import contacts.');
-            console.error('Import contacts error:', error);
-        } finally {
-            setImporting(false);
-        }
-    }
-
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -128,9 +113,6 @@ export default function ContactList() {
 
             <View style={styles.fabContainer} pointerEvents="box-none">
                 <Button title="Add Contact" onPress={() => router?.push?.('/addContact')} style={styles.fab} />
-            </View>
-            <View style={styles.importButton} pointerEvents="box-none">
-                <Button title={importing ? "Importing..." : "Import Contacts"} onPress={handleImportContacts} style={styles.fab} disabled={importing} />
             </View>
         </View>
     );
